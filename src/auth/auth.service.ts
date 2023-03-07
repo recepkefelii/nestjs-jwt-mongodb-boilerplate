@@ -1,11 +1,12 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable, Logger } from "@nestjs/common";
+import { BadRequestException, HttpException, HttpStatus, Injectable, Logger, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { AuthDto } from "./dto/auth.dto";
 import { User, UserDocument } from "./schema/user.schema";
 import * as bcrypt from 'bcrypt';
 import { JwtService } from "@nestjs/jwt";
 import { IUserPayload } from "./interface/user.interface";
+import { LoginDto } from "./dto/login.dto";
+import { RegisterDto } from "./dto/register.dto";
 
 @Injectable()
 export class AuthService {
@@ -17,7 +18,7 @@ export class AuthService {
         this.logger = new Logger()
     }
 
-    async register(body: AuthDto) {
+    async register(body: RegisterDto) {
         try {
 
             // Hashed password
@@ -26,7 +27,7 @@ export class AuthService {
             const hashedPassword = await bcrypt.hash(password, saltRounds)
 
             // Create Payload
-            const userPayload: IUserPayload = {
+            const payload: IUserPayload = {
                 name: body.name,
                 email: body.email,
             }
@@ -37,23 +38,41 @@ export class AuthService {
                 email: body.email,
                 password: hashedPassword
             })
-            const accessToken = await this.jwtSign(userPayload)
 
-            return { acessToken: accessToken }
+            return this.jwtSign(payload)
+
         } catch (error) {
             this.logger.error(error.message)
-            throw new HttpException("there is already an account using this email", HttpStatus.CONFLICT)
+            throw new HttpException("There is already an account using this email", HttpStatus.CONFLICT)
         }
 
     }
 
-    async login(body: AuthDto) {
-        const user = this.userModel.find({ name: body.name })
-        console.log(user);
+    async login(body: LoginDto) {
+        const user = await this.userModel.findOne({ email: body.email });
 
+        if (!user) {
+            throw new NotFoundException('No account with this email was found')
+        }
+
+        const decode = await bcrypt.compare(body.password, user.password)
+        console.log(decode);
+
+        if (!decode) {
+            throw new UnauthorizedException('Authentication failed. Wrong password')
+        }
+
+        const payload: IUserPayload = {
+            email: user.email,
+            name: user.name,
+            id: String(user._id)
+        }
+
+        return this.jwtSign(payload)
     }
 
     async jwtSign(payload: IUserPayload) {
-        return this.jwtService.sign(payload)
+        const accsessToken = this.jwtService.sign(payload)
+        return { accessToken: accsessToken }
     }
 }
