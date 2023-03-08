@@ -2,12 +2,12 @@ import { HttpException, HttpStatus, Injectable, Logger } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { RegisterDto } from "../dto/register.dto";
 import { User, UserDocument } from "../schema/user.schema";
 import * as bcrypt from 'bcrypt';
 import { IUserPayload } from "../interface/user.interface";
 import { ConfigService } from "@nestjs/config";
 import { MailService } from "src/common/mail/mail.service";
+import { UserdDto } from "src/users/dto/user.dto";
 
 @Injectable()
 export class RegisterService {
@@ -20,7 +20,7 @@ export class RegisterService {
     ) {
         this.logger = new Logger()
     }
-    async register(body: RegisterDto) {
+    async register(body: UserdDto) {
         try {
 
             // Hashed password
@@ -56,7 +56,7 @@ export class RegisterService {
         return { accessToken: accsessToken }
     }
 
-    private sendMailRegisterUser(user: RegisterDto): void {
+    private sendMailRegisterUser(user: UserdDto): void {
         try {
             this.mailerService.sendMail({
                 to: user.email,
