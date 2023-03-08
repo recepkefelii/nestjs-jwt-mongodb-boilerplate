@@ -1,7 +1,6 @@
 import { PickType } from "@nestjs/mapped-types";
 import { UserdDto } from "src/users/dto/user.dto";
 
-export class LoginDto extends PickType(UserdDto, [
-    'email',
+export class ChangePassWordDto extends PickType(UserdDto, [
     'password',
 ] as const) { }
