@@ -7,6 +7,7 @@ import { User, UserDocument } from "../schema/user.schema";
 import * as bcrypt from 'bcrypt';
 import { IUserPayload } from "../interface/user.interface";
 import { ConfigService } from "@nestjs/config";
+import { MailService } from "src/common/mail/mail.service";
 
 @Injectable()
 export class RegisterService {
@@ -14,7 +15,8 @@ export class RegisterService {
     constructor(
         @InjectModel(User.name) private userModel: Model<UserDocument>,
         private readonly jwtService: JwtService,
-        private readonly configServie: ConfigService
+        private readonly configServie: ConfigService,
+        private readonly mailerService: MailService,
     ) {
         this.logger = new Logger()
     }
@@ -31,6 +33,7 @@ export class RegisterService {
                 name: body.name,
                 email: body.email,
             }
+            this.sendMailRegisterUser(body)
 
             // Create User
             await this.userModel.create({
@@ -51,6 +54,27 @@ export class RegisterService {
         const secret = this.configServie.getOrThrow<string>("JWT_SECRET_KEY")
         const accsessToken = this.jwtService.sign(payload, { secret });
         return { accessToken: accsessToken }
+    }
+
+    private sendMailRegisterUser(user: RegisterDto): void {
+        try {
+            this.mailerService.sendMail({
+                to: user.email,
+                from: 'from@example.com',
+                subject: 'Registration successful ✔',
+                text: 'Registration successful!',
+                template: 'index',
+                context: {
+                    title: 'Registration successfully',
+                    description:
+                        "You did it! You registered!, You're successfully registered.✔",
+                    nameUser: user.name,
+                },
+            });
+            Logger.log('[MailService] User Registration: Send Mail successfully!');
+        } catch (err) {
+            Logger.error('[MailService] User Registration: Send Mail failed!', err);
+        }
     }
 
 }
