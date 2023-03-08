@@ -6,8 +6,6 @@ import { RegisterModule } from "./register/register.module";
 
 
 @Module({
-    imports: [LoginModule, RegisterModule,
-        AuthModule,
-    ],
+    imports: [LoginModule, RegisterModule],
 })
 export class AuthModule { }
