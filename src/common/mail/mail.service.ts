@@ -22,16 +22,16 @@ export class MailService {
 
         const options = {
             viewEngine: {
-                extname: '.hbs', // handlebars extension
+                extname: '.hbs',
                 layoutsDir:
                     process.cwd() +
-                    `${this.configService.get<string>('EMAIL_LAYOUT_DIR')}`, // location of handlebars templates
+                    `${this.configService.get<string>('EMAIL_LAYOUT_DIR')}`,
                 defaultLayout: `${this.configService.get<string>(
                     'EMAIL_DEFAULT_LAYOUT',
                 )}`, // name of main template
                 partialsDir:
                     process.cwd() +
-                    `${this.configService.get<string>('EMAIL_PARTIAL_DIR')}`, // location of your subtemplates aka. header, footer etc
+                    `${this.configService.get<string>('EMAIL_PARTIAL_DIR')}`,
             },
             viewPath:
                 process.cwd() + `${this.configService.get<string>('EMAIL_VIEW_PATH')}`,

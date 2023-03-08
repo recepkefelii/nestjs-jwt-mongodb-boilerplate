@@ -33,7 +33,6 @@ export class RegisterService {
                 name: body.name,
                 email: body.email,
             }
-            this.sendMailRegisterUser(body)
 
             // Create User
             await this.userModel.create({
@@ -42,6 +41,7 @@ export class RegisterService {
                 password: hashedPassword
             })
 
+            // this.sendMailRegisterUser(body)
             return this.jwtSign(payload)
 
         } catch (error) {
