@@ -17,11 +17,11 @@ async function bootstrap() {
       },
     }),
   );
-  // app.enableCors({
-  //   origin: configService.get<string>('ENDPOINT_CORS'),
-  //   methods: 'GET,POST,PUT,PATCH,DELETE',
-  //   credentials: true,
-  // });
+  app.enableCors({
+    origin: configService.get<string>('ENDPOINT_CORS'),
+    methods: 'GET,POST,PUT,PATCH,DELETE',
+    credentials: true,
+  });
   const port = configService.get<number>('API_PORT') || 3000;
   await app.listen(port);
 }
