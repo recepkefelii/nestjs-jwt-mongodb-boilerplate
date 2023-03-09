@@ -10,13 +10,13 @@ import * as bcrypt from 'bcrypt';
 @Injectable()
 export class ForgotPasswordService {
     constructor(
+        private readonly mailService: MailService,
         @InjectModel(User.name) private userModel: Model<UserDocument>,
-        private readonly mailService: MailService
     ) { }
     async forgotPassword(body: ForgotPassswordDto) {
         const saltRounds = 10
         const newPassword = crypto.randomUUID();
-        const hashedNewPassword = bcrypt.hash(newPassword, saltRounds)
+        const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds)
 
 
         const filter = { email: body.email }

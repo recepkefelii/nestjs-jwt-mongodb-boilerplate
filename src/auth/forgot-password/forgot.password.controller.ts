@@ -15,7 +15,7 @@ export class ForgotPasswordController {
                 status: HttpStatus.OK,
             };
         } catch (err) {
-            throw new BadRequestException(err, 'Error: Forgot password failed!');
+            throw new BadRequestException('Error: Forgot password failed!', { cause: err });
         }
     }
 }
